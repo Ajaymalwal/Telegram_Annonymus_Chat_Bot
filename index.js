@@ -1,12 +1,13 @@
 require('dotenv').config();
 const { Telegraf } = require('telegraf');
+const express = require('express');
+const app = express();
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
-let waitingUsers = [];  // Queue for users waiting to chat
-let chatPairs = new Map();  // user_id -> partner_id
+let waitingUsers = [];
+let chatPairs = new Map();
 
-// /start command
 bot.start((ctx) => {
   ctx.reply(`
 Welcome to Random Chat Bot! 🎭
@@ -19,7 +20,6 @@ Commands:
 `);
 });
 
-// /chat command - start matchmaking
 bot.command('chat', (ctx) => {
   const userId = ctx.from.id;
 
@@ -46,7 +46,6 @@ bot.command('chat', (ctx) => {
   }
 });
 
-// /endchat command
 bot.command('endchat', (ctx) => {
   const userId = ctx.from.id;
 
@@ -70,7 +69,6 @@ bot.command('endchat', (ctx) => {
   }
 });
 
-// /users command - show active users
 bot.command('users', (ctx) => {
   const waitingCount = waitingUsers.length;
   const chattingCount = chatPairs.size / 2;
@@ -80,7 +78,6 @@ bot.command('users', (ctx) => {
 💬 Chatting: ${chattingCount}`);
 });
 
-// Forward messages between paired users
 bot.on('message', (ctx) => {
   const userId = ctx.from.id;
   const partnerId = chatPairs.get(userId);
@@ -104,9 +101,18 @@ bot.on('message', (ctx) => {
   }
 });
 
-// Start bot
 bot.launch();
 console.log('Bot is running...');
+
+// Simple HTTP server on port 3000
+app.get('/', (req, res) => {
+  res.send('Random Chat Bot is running 🚀');
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Express server listening on port ${PORT}`);
+});
 
 process.once('SIGINT', () => bot.stop('SIGINT'));
 process.once('SIGTERM', () => bot.stop('SIGTERM'));
