@@ -15,6 +15,7 @@ You can anonymously chat with random people.
 Commands:
 /chat - Find a partner to chat
 /endchat - End current chat
+/users - Show active users
 `);
 });
 
@@ -67,6 +68,16 @@ bot.command('endchat', (ctx) => {
       ctx.reply('ℹ️ You are not in chat or queue.');
     }
   }
+});
+
+// /users command - show active users
+bot.command('users', (ctx) => {
+  const waitingCount = waitingUsers.length;
+  const chattingCount = chatPairs.size / 2;
+
+  ctx.reply(`📊 Users Info:
+🕒 Waiting: ${waitingCount}
+💬 Chatting: ${chattingCount}`);
 });
 
 // Forward messages between paired users
